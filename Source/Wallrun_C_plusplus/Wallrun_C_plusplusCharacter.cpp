@@ -69,6 +69,8 @@ void AWallrun_C_plusplusCharacter::BeginPlay()
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit);
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -99,6 +101,12 @@ void AWallrun_C_plusplusCharacter::SetupPlayerInputComponent(class UInputCompone
 	PlayerInputComponent->BindAxis("TurnRate", this, &AWallrun_C_plusplusCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AWallrun_C_plusplusCharacter::LookUpAtRate);
+}
+
+void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Capsule Hit!"));
+
 }
 
 void AWallrun_C_plusplusCharacter::OnFire()
