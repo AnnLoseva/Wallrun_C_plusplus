@@ -10,6 +10,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -106,9 +107,27 @@ void AWallrun_C_plusplusCharacter::SetupPlayerInputComponent(class UInputCompone
 void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
-	HitResult
+	FVector HitNormal = Hit.ImpactNormal;
+
+	if (!IsSurfaceWallRunable(HitNormal))
+	{
+		return;
+	}
+	
+
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Capsule Hit!"));
 
+}
+
+bool AWallrun_C_plusplusCharacter::IsSurfaceWallRunable(const FVector& SurfaceNormal)
+{
+	if (SurfaceNormal.Z > GetCharacterMovement()->GetWalkableFloorZ() || SurfaceNormal.Z < -0.005f)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Wrong!!"));
+		return false;
+	}
+
+	return true;
 }
 
 void AWallrun_C_plusplusCharacter::OnFire()

@@ -113,5 +113,7 @@ private:
 		void OnPlayerCapsuleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
+	bool IsSurfaceWallRunable(const FVector& SurfaceNormal);
+
 };
 
