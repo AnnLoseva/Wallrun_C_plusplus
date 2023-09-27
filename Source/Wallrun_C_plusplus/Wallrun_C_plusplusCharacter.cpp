@@ -105,6 +105,8 @@ void AWallrun_C_plusplusCharacter::SetupPlayerInputComponent(class UInputCompone
 
 void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+
+	HitResult
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Capsule Hit!"));
 
 }
