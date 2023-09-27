@@ -6,6 +6,16 @@
 #include "GameFramework/Character.h"
 #include "Wallrun_C_plusplusCharacter.generated.h"
 
+
+UENUM()
+enum class EWallRunSide : uint8
+{
+	None,
+	Left,
+	Right
+};
+
+
 class UInputComponent;
 class USkeletalMeshComponent;
 class USceneComponent;
