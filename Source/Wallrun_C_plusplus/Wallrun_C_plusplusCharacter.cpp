@@ -120,14 +120,17 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 	}
 
 	EWallRunSide Side = EWallRunSide::None;
+	FVector Direction = FVector::ZeroVector;
 	if (FVector::DotProduct(HitNormal, GetActorRightVector()) > 0)
 	{
 		Side = EWallRunSide::Left;
+		Direction = FVector::CrossProduct(HitNormal, FVector::UpVector).GetSafeNormal();
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Capsule Hit! LEFT"));
 	}
 	else
 	{
 		Side = EWallRunSide::Right;
+		Direction = FVector::CrossProduct(FVector::UpVector, HitNormal).GetSafeNormal();
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Capsule Hit! RIGHT"));
 	}
 
