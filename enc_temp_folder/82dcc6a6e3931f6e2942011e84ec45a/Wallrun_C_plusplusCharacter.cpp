@@ -114,11 +114,6 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 		return;
 	}
 	
-	if (!GetCharacterMovement()->IsFalling())
-	{
-		return;
-	}
-
 	EWallRunSide Side = EWallRunSide::None;
 	if (FVector::DotProduct(HitNormal, GetActorRightVector()) > 0)
 	{
@@ -131,12 +126,7 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Capsule Hit! RIGHT"));
 	}
 
-	if (!AreRequiredKeysDown(Side))
-	{
-		return;
-	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Can start wall run"));
 
 }
 
@@ -144,31 +134,11 @@ bool AWallrun_C_plusplusCharacter::IsSurfaceWallRunable(const FVector& SurfaceNo
 {
 	if (SurfaceNormal.Z > GetCharacterMovement()->GetWalkableFloorZ() || SurfaceNormal.Z < -0.005f)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Wrong!!"));
 		return false;
 	}
 
 	return true;
-}
-
-bool AWallrun_C_plusplusCharacter::AreRequiredKeysDown(EWallRunSide Side)
-{
-	if(ForwardAxis < 0.1f)
-	{
-		return false;
-	}
-	if (Side == EWallRunSide::Right && RightAxis < -0.1f)
-	{
-		return false;
-	}
-
-	if (Side == EWallRunSide::Left && RightAxis > 0.1f)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
 }
 
 void AWallrun_C_plusplusCharacter::OnFire()
@@ -253,7 +223,6 @@ void AWallrun_C_plusplusCharacter::OnFire()
 
 void AWallrun_C_plusplusCharacter::MoveForward(float Value)
 {
-	ForwardAxis = Value;
 	if (Value != 0.0f)
 	{
 		// add movement in that direction
@@ -263,7 +232,6 @@ void AWallrun_C_plusplusCharacter::MoveForward(float Value)
 
 void AWallrun_C_plusplusCharacter::MoveRight(float Value)
 {
-	RightAxis = Value;
 	if (Value != 0.0f)
 	{
 		// add movement in that direction
