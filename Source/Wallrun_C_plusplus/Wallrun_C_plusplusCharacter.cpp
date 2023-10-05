@@ -73,6 +73,33 @@ void AWallrun_C_plusplusCharacter::Tick(float DeltaSeconds)
 
 }
 
+void AWallrun_C_plusplusCharacter::Jump()
+{
+	if (bIsWallRunning)
+	{
+		FVector JumpDirection = FVector::ZeroVector;
+		if (CurrentWallRunSide == EWallRunSide::Right)
+		{
+			JumpDirection = FVector::CrossProduct(CurrentWallRunDirection, FVector::UpVector).GetSafeNormal();
+		}
+		else
+		{
+			JumpDirection = FVector::CrossProduct(FVector::UpVector,CurrentWallRunDirection).GetSafeNormal();
+		}
+
+		JumpDirection += FVector::UpVector;
+
+		LaunchCharacter(GetCharacterMovement()->JumpZVelocity * JumpDirection.GetSafeNormal(), false, true);
+
+		StopWallRun();
+
+	}
+	else
+	{
+		Super::Jump();
+	}
+}
+
 void AWallrun_C_plusplusCharacter::BeginPlay()
 {
 	// Call the base class  

@@ -54,6 +54,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void Jump() override; 
+
 protected:
 	virtual void BeginPlay();
 
