@@ -136,18 +136,7 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 
 	EWallRunSide Side = EWallRunSide::None;
 	FVector Direction = FVector::ZeroVector;
-	if (FVector::DotProduct(HitNormal, GetActorRightVector()) > 0)
-	{
-		Side = EWallRunSide::Left;
-		Direction = FVector::CrossProduct(HitNormal, FVector::UpVector).GetSafeNormal();
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("Capsule Hit! LEFT"));
-	}
-	else
-	{
-		Side = EWallRunSide::Right;
-		Direction = FVector::CrossProduct(FVector::UpVector, HitNormal).GetSafeNormal();
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, TEXT("Capsule Hit! RIGHT"));
-	}
+	GetWallRunSideAndDirection(HitNormal, Side, Direction);
 
 	if (!AreRequiredKeysDown(Side))
 	{
@@ -157,8 +146,22 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 	StrartWallRun(Side, Direction);
 }
 
+void AWallrun_C_plusplusCharacter::GetWallRunSideAndDirection(const FVector& HitNormal, EWallRunSide& OutSide, FVector& OutDirection)const
+{
+	if (FVector::DotProduct(HitNormal, GetActorRightVector()) > 0)
+	{
+		OutSide = EWallRunSide::Left;
+		OutDirection = FVector::CrossProduct(HitNormal, FVector::UpVector).GetSafeNormal();
+	}
+	else
+	{
+		OutSide = EWallRunSide::Right;
+		OutDirection = FVector::CrossProduct(FVector::UpVector, HitNormal).GetSafeNormal();
+	}
+}
 
-bool AWallrun_C_plusplusCharacter::IsSurfaceWallRunable(const FVector& SurfaceNormal)
+
+bool AWallrun_C_plusplusCharacter::IsSurfaceWallRunable(const FVector& SurfaceNormal)const
 {
 	if (SurfaceNormal.Z > GetCharacterMovement()->GetWalkableFloorZ() || SurfaceNormal.Z < -0.005f)
 	{
@@ -168,7 +171,7 @@ bool AWallrun_C_plusplusCharacter::IsSurfaceWallRunable(const FVector& SurfaceNo
 	return true;
 }
 
-bool AWallrun_C_plusplusCharacter::AreRequiredKeysDown(EWallRunSide Side)
+bool AWallrun_C_plusplusCharacter::AreRequiredKeysDown(EWallRunSide Side)const
 {
 	if(ForwardAxis < 0.1f)
 	{
@@ -221,6 +224,12 @@ void AWallrun_C_plusplusCharacter::StopWallRun()
 
 void AWallrun_C_plusplusCharacter::UpdateWallRun()
 {
+	if (!AreRequiredKeysDown(CurrentWallRunSide))
+	{
+		StopWallRun();
+		return;
+	}
+
 	FHitResult HitResult;
 
 	FVector LineTraceDirection = CurrentWallRunSide == EWallRunSide::Right ? GetActorRightVector() : -GetActorRightVector();
@@ -233,7 +242,24 @@ void AWallrun_C_plusplusCharacter::UpdateWallRun()
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 
-	if (!GetWorld()->LineTraceSingleByChannel(HitResult, StartPosition, EndPosition, ECC_Visibility, QueryParams))
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartPosition, EndPosition, ECC_Visibility, QueryParams))
+	{ 
+		FVector HitNormal = HitResult.ImpactNormal; 
+		EWallRunSide Side = EWallRunSide::None;
+		FVector Direction = FVector::ZeroVector;
+		GetWallRunSideAndDirection(HitResult.ImpactNormal, Side, Direction);
+
+		if (Side != CurrentWallRunSide)
+		{
+			StopWallRun();
+		}
+		else
+		{
+			CurrentWallRunDirection = Direction;
+			GetCharacterMovement()->Velocity = GetCharacterMovement()->GetMaxSpeed() * CurrentWallRunDirection;
+		}
+	}
+	else
 	{
 		StopWallRun();
 	}

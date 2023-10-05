@@ -128,10 +128,12 @@ private:
 	UFUNCTION()
 		void OnPlayerCapsuleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	void GetWallRunSideAndDirection(const FVector& HitNormal, EWallRunSide& OutSide, FVector& OutDirection)const;
 
-	bool IsSurfaceWallRunable(const FVector& SurfaceNormal);
 
-	bool AreRequiredKeysDown(EWallRunSide Side);
+	bool IsSurfaceWallRunable(const FVector& SurfaceNormal)const;
+
+	bool AreRequiredKeysDown(EWallRunSide Side)const;
 
 	float ForwardAxis = 0.0f;
 	float RightAxis = 0.0f;
