@@ -104,6 +104,10 @@ protected:
 	void LookUpAtRate(float Rate);
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Wallrun", meta = (UIMin = 0.0f, ClampMin = 0.0f))
+	float MaxWallRunTime = 1.0f;
+
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -129,5 +133,17 @@ private:
 
 	float ForwardAxis = 0.0f;
 	float RightAxis = 0.0f;
+
+	void StrartWallRun(EWallRunSide Side, const FVector& Direction);
+	void StopWallRun();
+	void UpdateWallRun();
+
+	bool bIsWallRunning = false;
+	EWallRunSide CurrentWallRunSide = EWallRunSide::None;
+	FVector CurrentWallRunDirection = FVector::ZeroVector;
+
+	FTimerHandle WallRunTimer; 
+
+
 };
 

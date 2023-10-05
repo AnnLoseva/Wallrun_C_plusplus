@@ -71,6 +71,7 @@ void AWallrun_C_plusplusCharacter::BeginPlay()
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit);
+	GetCharacterMovement()->SetPlaneConstraintEnabled(true);
 
 }
 
@@ -109,11 +110,16 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 
 	FVector HitNormal = Hit.ImpactNormal;
 
+	if (bIsWallRunning)
+	{
+		return;
+	}
+
 	if (!IsSurfaceWallRunable(HitNormal))
 	{
 		return;
 	}
-	
+
 	if (!GetCharacterMovement()->IsFalling())
 	{
 		return;
@@ -138,10 +144,10 @@ void AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit(UPrimitiveComponent* HitCo
 	{
 		return;
 	}
-	
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("Can start wall run"));
 
+	StrartWallRun(Side, Direction);
 }
+
 
 bool AWallrun_C_plusplusCharacter::IsSurfaceWallRunable(const FVector& SurfaceNormal)
 {
@@ -172,6 +178,40 @@ bool AWallrun_C_plusplusCharacter::AreRequiredKeysDown(EWallRunSide Side)
 	{
 		return true;
 	}
+}
+
+void AWallrun_C_plusplusCharacter::StrartWallRun(EWallRunSide Side, const FVector& Direction)
+{
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("WallRun Started!"));
+
+	bIsWallRunning = true;
+
+	CurrentWallRunSide = Side;
+	CurrentWallRunDirection = Direction;
+
+	GetCharacterMovement()->SetPlaneConstraintNormal(FVector::UpVector);
+
+	GetWorld()->GetTimerManager().SetTimer(WallRunTimer, this, &AWallrun_C_plusplusCharacter::StopWallRun, MaxWallRunTime, false);
+
+}
+
+void AWallrun_C_plusplusCharacter::StopWallRun()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("WallRun Ended!"));
+
+	bIsWallRunning = false;
+
+	CurrentWallRunSide = EWallRunSide::None;
+	CurrentWallRunDirection = FVector::ZeroVector;
+
+
+	GetCharacterMovement()->SetPlaneConstraintNormal(FVector::ZeroVector);
+
+}
+
+void AWallrun_C_plusplusCharacter::UpdateWallRun()
+{
 }
 
 void AWallrun_C_plusplusCharacter::OnFire()
