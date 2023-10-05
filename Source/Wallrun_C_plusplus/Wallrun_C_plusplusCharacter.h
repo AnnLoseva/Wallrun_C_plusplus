@@ -50,6 +50,8 @@ class AWallrun_C_plusplusCharacter : public ACharacter
 public:
 	AWallrun_C_plusplusCharacter();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 protected:
 	virtual void BeginPlay();
 

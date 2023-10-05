@@ -62,6 +62,15 @@ AWallrun_C_plusplusCharacter::AWallrun_C_plusplusCharacter()
 
 }
 
+void AWallrun_C_plusplusCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (bIsWallRunning)
+	{
+		UpdateWallRun();
+	}
+}
+
 void AWallrun_C_plusplusCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -212,6 +221,24 @@ void AWallrun_C_plusplusCharacter::StopWallRun()
 
 void AWallrun_C_plusplusCharacter::UpdateWallRun()
 {
+	FHitResult HitResult;
+
+	FVector LineTraceDirection = CurrentWallRunSide == EWallRunSide::Right ? GetActorRightVector() : -GetActorRightVector();
+
+	float LineTraceLength = 200.0f;
+	FVector StartPosition = GetActorLocation();
+
+	FVector EndPosition = StartPosition + LineTraceLength * LineTraceDirection;
+	
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	if (!GetWorld()->LineTraceSingleByChannel(HitResult, StartPosition, EndPosition, ECC_Visibility, QueryParams))
+	{
+		StopWallRun();
+	}
+
+
 }
 
 void AWallrun_C_plusplusCharacter::OnFire()
