@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/TimelineComponent.h"
 #include "Wallrun_C_plusplusCharacter.generated.h"
+
 
 
 UENUM()
@@ -109,6 +111,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Wallrun", meta = (UIMin = 0.0f, ClampMin = 0.0f))
 	float MaxWallRunTime = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WallRun")
+	UCurveFloat* CameraTiltCurve;
+
 
 protected:
 	// APawn interface
@@ -142,12 +147,17 @@ private:
 	void StopWallRun();
 	void UpdateWallRun();
 
+	FORCEINLINE  void BeginCameraTilt() {CameraTiltTimeline.Play();}
+	
+	UFUNCTION()
+	void UpdateCameraTilt(float Value);
+	FORCEINLINE  void EndCameraTilt() { CameraTiltTimeline.Reverse(); }
+
 	bool bIsWallRunning = false;
 	EWallRunSide CurrentWallRunSide = EWallRunSide::None;
 	FVector CurrentWallRunDirection = FVector::ZeroVector;
 
 	FTimerHandle WallRunTimer; 
-
-
+	FTimeline CameraTiltTimeline;
 };
 

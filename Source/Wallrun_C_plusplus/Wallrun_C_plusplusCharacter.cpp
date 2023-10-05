@@ -69,6 +69,8 @@ void AWallrun_C_plusplusCharacter::Tick(float DeltaSeconds)
 	{
 		UpdateWallRun();
 	}
+	CameraTiltTimeline.TickTimeline(DeltaSeconds);
+
 }
 
 void AWallrun_C_plusplusCharacter::BeginPlay()
@@ -81,6 +83,15 @@ void AWallrun_C_plusplusCharacter::BeginPlay()
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AWallrun_C_plusplusCharacter::OnPlayerCapsuleHit);
 	GetCharacterMovement()->SetPlaneConstraintEnabled(true);
+
+	if (IsValid(CameraTiltCurve))
+	{
+		FOnTimelineFloat TimeLineCallBack;
+		TimeLineCallBack.BindUFunction(this, FName("UpdateCameraTilt"));
+		CameraTiltTimeline.AddInterpFloat(CameraTiltCurve, TimeLineCallBack);
+
+
+	}
 
 }
 
@@ -196,6 +207,7 @@ void AWallrun_C_plusplusCharacter::StrartWallRun(EWallRunSide Side, const FVecto
 {
 
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TEXT("WallRun Started!"));
+	BeginCameraTilt();
 
 	bIsWallRunning = true;
 
@@ -212,10 +224,10 @@ void AWallrun_C_plusplusCharacter::StopWallRun()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("WallRun Ended!"));
 
+	EndCameraTilt();
+
 	bIsWallRunning = false;
 
-	CurrentWallRunSide = EWallRunSide::None;
-	CurrentWallRunDirection = FVector::ZeroVector;
 
 
 	GetCharacterMovement()->SetPlaneConstraintNormal(FVector::ZeroVector);
@@ -264,6 +276,14 @@ void AWallrun_C_plusplusCharacter::UpdateWallRun()
 		StopWallRun();
 	}
 
+
+}
+
+void AWallrun_C_plusplusCharacter::UpdateCameraTilt(float Value)
+{
+	FRotator CurrentControlRotation = GetControlRotation();
+	CurrentControlRotation.Roll = CurrentWallRunSide == EWallRunSide::Left ? Value : -Value;
+	GetController()->SetControlRotation(CurrentControlRotation);
 
 }
 
